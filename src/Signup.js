@@ -1,125 +1,96 @@
+// src/Signup.js
 import React, { useState } from "react";
 import {
-  Box,
-  Button,
   Container,
   TextField,
+  Button,
   Typography,
+  Box,
   Paper,
   Divider,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import GoogleIcon from "@mui/icons-material/Google";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Signup() {
-  const [form, setForm] = useState({
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
+export default function Signup({ onLogin }) {
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Z])(?=.*\d).{8,}$/; 
-    return regex.test(password);
-  };
-
-  const validatePhone = (phone) => {
-    const regex = /^[0-9]{10,15}$/; // allow 10–15 digits
-    return regex.test(phone);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Signup Data:", form);
 
-    if (!validatePhone(form.phone)) {
-      setError("Please enter a valid phone number (10–15 digits).");
-      return;
+    // Simulate signup success
+    if (typeof onLogin === "function") {
+      onLogin({ name: form.name || "New User", avatar: "" });
     }
+    navigate("/product");
+  };
 
-    if (!validatePassword(form.password)) {
-      setError(
-        "Password must be at least 8 characters, include 1 uppercase letter and 1 number."
-      );
-      return;
+  const handleGoogleSignup = () => {
+    console.log("Google Signup clicked");
+    if (typeof onLogin === "function") {
+      onLogin({ name: "Google User", avatar: "" });
     }
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
+    navigate("/product");
+  };
+
+  const handleGithubSignup = () => {
+    console.log("GitHub Signup clicked");
+    if (typeof onLogin === "function") {
+      onLogin({ name: "GitHub User", avatar: "" });
     }
-    setError("");
-    alert("✅ Signup successful (connect backend later)");
+    navigate("/product");
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 6 }}>
-        <Typography variant="h4" align="center" gutterBottom fontWeight="bold">
-          Create an Account
+    <Container maxWidth="sm" sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+      <Paper sx={{ p: 4, width: "100%", borderRadius: 3, boxShadow: 6 }}>
+        <Typography variant="h5" align="center" fontWeight={700} gutterBottom>
+          Create Your Account
         </Typography>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        {/* Signup Form */}
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          <TextField
+            label="Name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
           <TextField
             label="Email"
             name="email"
-            type="email"
-            fullWidth
-            margin="normal"
             value={form.email}
             onChange={handleChange}
-            required
-          />
-
-          <TextField
-            label="Phone Number"
-            name="phone"
-            type="tel"
             fullWidth
-            margin="normal"
-            value={form.phone}
-            onChange={handleChange}
             required
-            helperText="Enter a valid phone number (digits only)"
           />
-
           <TextField
             label="Password"
             name="password"
             type="password"
-            fullWidth
-            margin="normal"
             value={form.password}
             onChange={handleChange}
-            required
-            helperText="At least 8 characters, include uppercase and number"
-          />
-
-          <TextField
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
             fullWidth
-            margin="normal"
-            value={form.confirmPassword}
-            onChange={handleChange}
             required
           />
-
-          {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
-          )}
-
           <Button
             type="submit"
-            fullWidth
             variant="contained"
-            sx={{ mt: 3, py: 1.2, fontWeight: "bold", background: "#1f6feb" }}
+            sx={{ background: "#16a34a", mt: 2 }}
+            fullWidth
           >
             Sign Up
           </Button>
@@ -128,23 +99,46 @@ export default function Signup() {
         {/* Divider */}
         <Divider sx={{ my: 3 }}>OR</Divider>
 
-        {/* Google Signup */}
-        <Button
-          fullWidth
-          variant="outlined"
-          sx={{ py: 1.2, fontWeight: "bold" }}
-          onClick={() => alert("🔗 Google signup to be integrated with Firebase")}
-        >
-          Sign up with Google
-        </Button>
+        {/* Social Signup */}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Button
+            onClick={handleGoogleSignup}
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            fullWidth
+            sx={{
+              textTransform: "none",
+              borderColor: "rgba(0,0,0,0.2)",
+              "&:hover": { borderColor: "#16a34a", color: "#16a34a" },
+            }}
+          >
+            Sign Up with Google
+          </Button>
 
-        {/* Already have account */}
-        <Typography align="center" sx={{ mt: 3 }}>
-          Already have an account?{" "}
-          <Link to="/signin" style={{ color: "#1f6feb", fontWeight: "bold" }}>
-            Sign In
-          </Link>
-        </Typography>
+          <Button
+            onClick={handleGithubSignup}
+            variant="outlined"
+            startIcon={<GitHubIcon />}
+            fullWidth
+            sx={{
+              textTransform: "none",
+              borderColor: "rgba(0,0,0,0.2)",
+              "&:hover": { borderColor: "#16a34a", color: "#16a34a" },
+            }}
+          >
+            Sign Up with GitHub
+          </Button>
+        </Box>
+
+        {/* Signin Link */}
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Typography variant="body2">
+            Already have an account?{" "}
+            <Link to="/signin" style={{ color: "#16a34a", fontWeight: 600 }}>
+              Sign In
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
