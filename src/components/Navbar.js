@@ -11,14 +11,22 @@ import {
   MenuItem,
   Divider,
   ButtonBase,
+  IconButton,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar({ user, onLogout }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    handleMenuClose();
+    if (typeof onLogout === "function") onLogout();
+    navigate("/");
+  };
 
   return (
     <AppBar
@@ -30,7 +38,7 @@ export default function Navbar({ user, onLogout }) {
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Clickable logo (image + text) - wraps everything in ButtonBase linked to "/" */}
+        {/* Clickable logo (image + text) */}
         <ButtonBase
           component={Link}
           to="/"
@@ -96,12 +104,14 @@ export default function Navbar({ user, onLogout }) {
             </>
           ) : (
             <>
-              <Avatar
-                alt={user.name || "User"}
-                src={user.avatar || ""}
-                sx={{ bgcolor: "#16a34a", cursor: "pointer" }}
-                onClick={handleMenuOpen}
-              />
+              <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
+                <Avatar
+                  alt={user.name || "User"}
+                  src={user.avatar || ""}
+                  sx={{ bgcolor: "#16a34a", width: 40, height: 40 }}
+                />
+              </IconButton>
+
               <Menu
                 anchorEl={anchorEl}
                 open={open}
@@ -109,19 +119,17 @@ export default function Navbar({ user, onLogout }) {
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
               >
-                <MenuItem onClick={() => { handleMenuClose(); /* navigate to profile if desired */ }}>
+                <MenuItem onClick={() => { handleMenuClose(); navigate("/profile"); }}>
                   Profile
                 </MenuItem>
-                <MenuItem onClick={() => { handleMenuClose(); /* navigate to settings if desired */ }}>
+                <MenuItem onClick={() => { handleMenuClose(); navigate("/settings"); }}>
                   Settings
                 </MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); navigate("/change-password"); }}>
+                  Change Password
+                </MenuItem>
                 <Divider />
-                <MenuItem
-                  onClick={() => {
-                    handleMenuClose();
-                    onLogout();
-                  }}
-                >
+                <MenuItem onClick={handleLogoutClick}>
                   Logout
                 </MenuItem>
               </Menu>

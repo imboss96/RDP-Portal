@@ -11,30 +11,47 @@ import {
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
-export default function Signin() {
+export default function Signin({ onLogin }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect query param (default to /product if not provided)
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get("redirect") || "/product";
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const finishLogin = (userData) => {
+    if (typeof onLogin === "function") {
+      onLogin(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
+    navigate(redirectPath); // ✅ go where user intended
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("✅ Sign In successful (mock)");
-    navigate("/product");
+    console.log("✅ Sign In successful (mock)");
+    finishLogin({
+      name: "Demo User",
+      email: form.email,
+      avatar: "",
+    });
   };
 
   const handleGoogleLogin = () => {
-    alert("✅ Google Sign In successful (mock)");
-    navigate("/product");
+    console.log("Google Login clicked");
+    finishLogin({ name: "Google User", avatar: "" });
   };
 
   const handleGithubLogin = () => {
-    alert("✅ GitHub Sign In successful (mock)");
-    navigate("/product");
+    console.log("GitHub Login clicked");
+    finishLogin({ name: "GitHub User", avatar: "" });
   };
 
   return (
@@ -80,16 +97,6 @@ export default function Signin() {
           </Button>
         </Box>
 
-        {/* Forgot Password */}
-        <Typography
-          align="right"
-          sx={{ mt: 1, fontSize: "0.9rem" }}
-        >
-          <Link to="/reset-password" style={{ color: "#1f6feb", fontWeight: "bold" }}>
-            Forgot password?
-          </Link>
-        </Typography>
-
         {/* Divider */}
         <Divider sx={{ my: 3 }}>OR</Divider>
 
@@ -124,13 +131,23 @@ export default function Signin() {
           </Button>
         </Box>
 
-        {/* No account yet */}
-        <Typography align="center" sx={{ mt: 3 }}>
-          Don’t have an account?{" "}
-          <Link to="/signup" style={{ color: "#1f6feb", fontWeight: "bold" }}>
-            Sign Up
-          </Link>
-        </Typography>
+        {/* Signup & Reset Links */}
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <Typography variant="body2">
+            Don’t have an account?{" "}
+            <Link to="/signup" style={{ color: "#16a34a", fontWeight: 600 }}>
+              Sign Up
+            </Link>
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            <Link
+              to="/reset-password"
+              style={{ color: "#16a34a", fontWeight: 600 }}
+            >
+              Forgot Password?
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
